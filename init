@@ -126,6 +126,7 @@ for topath, url in pairs(install_files) do
   local download = downloader.readAll()
   downloader.close()
   fs.makeDir(install_to.."/"..topath)
+  fs.delete(install_to.."/"..topath)
   local file = fs.open(install_to.."/"..topath, "w")
   file.write(download)
   file.close()
