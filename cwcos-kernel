@@ -17,7 +17,7 @@ local function centerTextXY(text)
   io.write(text)
 end
 -- OS Config
-os_name = "CWCOS"
+os_name = "CWCOS Kernel"
 os_version_major = 0
 os_version_minor = 1
 os_version_revision = 0
