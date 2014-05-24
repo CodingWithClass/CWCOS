@@ -1,1 +1,11 @@
-{["startup"]="http://pastebin.com/raw.php?i=csC29fp8",}
+{
+  ["/startup"] = "http://pastebin.com/raw.php?i=W1ktzU79",
+  ["/boot/kernel/boot"] = "http://pastebin.com/raw.php?i=qppHfqAC",
+  ["/bin/init"] = "http://pastebin.com/raw.php?i=iHah2U3T",
+  ["/etc/init.d/on/cossh"] = "http://pastebin.com/raw.php?i=nQVatnsM",
+  ["/etc/init.d/on/exists"] = "http://pastebin.com/raw.php?i=MnqvEZ50",
+  ["/etc/init.d/off/exists"] = "http://pastebin.com/raw.php?i=MnqvEZ50",
+  ["/bin/reboot"] = "http://pastebin.com/raw.php?i=WCvWyeS1",
+  ["/bin/shutdown"] = "http://pastebin.com/raw.php?i=bJyyviLp",
+  ["/usr/bin/pkg"] = "http://pastebin.com/raw.php?i=a9qDnAcp",
+}
