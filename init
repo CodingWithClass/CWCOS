@@ -17,13 +17,13 @@ local function centerTextXY(text)
   io.write(text)
 end
 -- OS Config
-os_name = "CWCOS Kernel Init"
+os_name = "CWCOS"
 os_version_major = 0
 os_version_minor = 1
 os_version_revision = 0
 os_version_abr = "alpha"
 license_url = "http://opensource.org/licenses/BSD-3-Clause"
-github_repo = "CodingWithClass/CWCOS/init"
+github_repo = "CodingWithClass/CWCOS/master"
 -- Terminal clearers
 function clearTermWName(fg, bg)
   colorTerm(fg, bg)
@@ -127,6 +127,9 @@ for topath, url in pairs(install_files) do
   downloader.close()
   fs.makeDir(install_to.."/"..topath)
   fs.delete(install_to.."/"..topath)
+  if fs.exists(install_to.."/"..topath) then
+    fs.delete(install_to.."/"..topath)
+  end
   local file = fs.open(install_to.."/"..topath, "w")
   file.write(download)
   file.close()
