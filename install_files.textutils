@@ -1,3 +1,5 @@
 {
   ["/bin/init"] = "http://pastebin.com/raw.php?i=iHah2U3T",
+  ["/etc/init.d/on/exists"] = "http://pastebin.com/raw.php?i=MnqvEZ50",
+  ["/etc/init.d/off/exists"] = "http://pastebin.com/raw.php?i=MnqvEZ50",
 }
