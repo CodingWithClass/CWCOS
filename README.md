@@ -1,4 +1,4 @@
-CWCOS
+Package Repo
 =====
 
-GitHub Repo
+Repository for the `package` package manager.
