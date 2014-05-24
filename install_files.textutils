@@ -1,1 +1,4 @@
-{["startup"]="http://pastebin.com/raw.php?i=csC29fp8",}
+{
+  ["/bin/reboot"] = "http://pastebin.com/raw.php?i=WCvWyeS1",
+  ["/bin/shutdown"] = "http://pastebin.com/raw.php?i=bJyyviLp",
+}
