@@ -1,124 +1,133 @@
-local tArgs = { ... }
-theapi = {}
-function theapi.createDirectory(_dir)
-  fs.makeDir(_dir)
+-- http://www.computercraft.info/forums2/index.php?/topic/18815-customizable-installer-program on CC Forums
+-- CWCOS and its installer is licensed under the BSD 3-Clause License.
+-- Copyright (c) 2014 ClassCoder
+-- See the license at http://opensource.org/licenses/BSD-3-Clause.
+-- Various functions with minor indentation modification
+-- http://www.computercraft.info/forums2/index.php?/topic/460-how-to-center-text/page__view__findpost__p__2948
+local function centerText(text)
+  local x,y = term.getSize()
+  local x2,y2 = term.getCursorPos()
+  term.setCursorPos(math.ceil((x / 2) - (text:len() / 2)), y2)
+  write(text)
 end
-function theapi.deleteFile(_file)
-  fs.delete(_file)
+-- http://www.computercraft.info/forums2/index.php?/topic/460-how-to-center-text/page__view__findpost__p__70667
+local function centerTextXY(text)
+  local w, h = term.getSize()
+  term.setCursorPos(math.floor(w / 2 - text:len() / 2 + .5), math.floor(h / 2 + .5))
+  io.write(text)
 end
-function theapi.download(_url, _to)
-  if not fs.exists(_to) then
-    fs.makeDir(_to)
-    fs.delete(_to)
-  end
-  local httphandle = http.get(_url)
-  local httptext = httphandle.readAll()
-  httphandle.close()
-  local filehandle = fs.open(_to, "w")
-  filehandle.write(httptext)
-  filehandle.close()
+-- OS Config
+os_name = "Package"
+os_version_major = 0
+os_version_minor = 1
+os_version_revision = 0
+os_version_abr = "alpha"
+license_url = "http://opensource.org/licenses/BSD-3-Clause"
+github_repo = "CodingWithClass/CWCOS/package"
+-- Terminal clearers
+function clearTermWName(fg, bg)
+  colorTerm(fg, bg)
+  term.clear()
+  term.setCursorPos(1, 1)
+  centerText(os_name.." Installer")
+  term.setCursorPos(1, 2)
 end
-
-toinstaller = {
-  ["install"] = theapi
-}
-
-if fs.exists("/pkg/.lock") then
-  term.setTextColor(colors.red)
-  error("ERROR: Could not obtain lock. Is another pkg process running? (/pkg/.lock exists)")
+function clearTerm()
+  term.clear()
+  term.setCursorPos(1, 1)
 end
-
-if not http then
-  term.setTextColor(colors.red)
-  print("ERROR: package requires the HTTP API enabled and firewall disabled. Please enable HTTP and set the firewall to \"*\" in the ComputerCraft config.")
+function resetTerm()
+  colorTerm(colors.white, colors.black)
+  clearTerm()
+  term.setCursorPos(1, 1)
 end
-
-if not fs.isDir("/pkg") then
-  print("First run stuff happening")
-  print("Creating /pkg")
-  fs.makeDir("/pkg")
+-- Terminal colorer
+function colorTerm(fg, bg)
+  term.setTextColor(fg)
+  term.setBackgroundColor(bg)
 end
-
-if not fs.exists("/pkg/repo") then
-  print("Creating /pkg/repo")
-  local repofile = fs.open("/pkg/repo", "w")
-  repofile.write("CodingWithClass/CWCOS")
-  repofile.close()
-end
-
-if not fs.exists("/usr/bin/arc") then
-  print("Downloading arc")
-  local tarHTTP = http.get("http://pastebin.com/raw.php?i=VdJMpxkS")
-  local tar = tarHTTP.readAll()
-  tarHTTP.close()
-  local tarFile = fs.open("/usr/bin/arc", "w")
-  tarFile.write(tar)
-  tarFile.close()
-end
-
-local lock = fs.open("/pkg/.lock", "w")
-lock.write(" ")
-lock.close()
-
-print("Loading repo...")
-local repofile = fs.open("/pkg/repo", "r")
-ghrepo = repofile:readAll()
-local packageListHTTP = http.get("https://raw.githubusercontent.com/"..ghrepo.."/packagerepo/packages")
-if not packageListHTTP and not fs.exists("/pkg/repocache") then
-  term.setTextColor(colors.red)
-  fs.delete("/pkg/.lock")
-  error("ERROR: Package list failed to load from repository and no cache exists. Please check you can get a connection to GitHub.")
-elseif not packageListHTTP and fs.exists("/pkg/repocache") then
-  term.setTextColor(colors.orange)
-  print("WARNING: Package list failed to load from repository. Using cache.")
-  local packageListFile = fs.open("/pkg/cache", "r")
-  local textPackageList = packageListFile.readAll()
-  packageListFile.close()
-  packageList = textutils.unserialize(textPackageList)
-else
-  local textPackageList = packageListHTTP.readAll()
-  packageListHTTP.close()
-  packageList = textutils.unserialize(textPackageList)
-  print("Downloaded")
-end
-print("Caching...")
-packageListCache = fs.open("/pkg/cache", "w")
-packageListCache.write(textutils.serialize(packageList))
-packageListCache.close()
-print(textutils.serialize(tArgs))
-print(textutils.serialize({ ... }))
-if tArgs[1] == "find" then
-  print("Packages:")
-  for _,pname in pairs(packageList) do
-    print(pname)
-  end
-elseif tArgs[1] == "install" then
-  print("Finding package "..tArgs[2])
-  local found = false
-  for _,pname in pairs(packageList) do
-    if pname == tArgs[2] then
-      print("Found")
-      found = true
-      break
+-- Wait for a scancode
+function waitForScanCode(code)
+  local waiting = true
+  while waiting do
+    local event, scancode = os.pullEvent("key")
+    if scancode == code then
+      waiting = false
     end
   end
-  if not found then
-    term.setTextColor(colors.red)
-    fs.delete("/pkg/.lock")
-    error("ERROR: Package not found in list")
-  end
-  print("Downloading")
-  local packageHTTP = http.get("https://raw.githubusercontent.com/"..ghrepo.."/packagerepo/"..tArgs[2])
-  local packageinstaller = packageHTTP.readAll()
-  local packagetempfile = fs.open("/pkg/tmp/install", "w")
-  packagetempfile.write(packageinstaller)
-  packagetempfile.close()
-  if not fs.isDir("/pkg/tmp") then
-    fs.makeDir("/pkg/tmp")
-  end
-  os.run({toinstaller}, "/pkg/tmp/install")
-  print("Installed")
 end
 
-fs.delete("/pkg/tmp")
-fs.delete("/pkg/.lock")
+-- Loading screen - black fg and gray bg
+colorTerm(colors.black, colors.gray)
+clearTerm()
+centerTextXY(os_name.." Installer")
+local sizex, sizey = term.getSize()
+term.setCursorPos(1, sizey)
+centerText("Loading...")
+term.setCursorPos(1, 1)
+sleep(3)
+
+clearTermWName(colors.white, colors.cyan)
+print("Hello, user!")
+print("Welcome to the "..os_name.." version "..os_version_major.."."..os_version_minor.."."..os_version_revision.." "..os_version_abr.." installer.")
+print("You will first need to accept the license at")
+print(license_url)
+print("before installation.")
+term.setCursorPos(1, sizey-2)
+centerText("Press enter to select")
+term.setCursorPos(1, sizey)
+colorTerm(colors.white, colors.green)
+centerText("   Accept   ")
+waitForScanCode(28)
+clearTermWName(colors.white, colors.cyan)
+centerText("Select a Disk")
+print(" ")
+if fs.exists("/") then
+  if fs.getFreeSpace("/") then
+    print("/: Free space: "..fs.getFreeSpace("/"))
+  else
+    print("/")
+  end
+end
+if fs.exists("/disk") then
+  if fs.getFreeSpace("/disk") then
+    print("/disk: Free space: "..fs.getFreeSpace("/disk"))
+  else
+    print("/disk")
+  end
+end
+term.setCursorPos(1, sizey-2)
+centerText("Type the name of one (/ or /disk)")
+term.setCursorPos(1, sizey)
+write(": ")
+install_to = read()
+if not fs.exists(install_to) then
+  termReset()
+  print("ERROR: That location does not exist.")
+  os.exit()
+end
+clearTermWName(colors.white, colors.red)
+centerText("ARE YOU SURE YOU WISH TO INSTALL TO")
+print(" ")
+centerText(install_to)
+term.setCursorPos(1, sizey-2)
+centerText("Press enter to select")
+term.setCursorPos(1, sizey)
+colorTerm(colors.white, colors.green)
+centerText("   Install   ")
+waitForScanCode(28)
+clearTermWName(colors.white, colors.green)
+centerTextXY("Downloading file list from GitHub")
+local install_files = textutils.unserialize(http.get("https://raw.githubusercontent.com/"..github_repo.."/install_files.textutils").readAll())
+for topath, url in pairs(install_files) do
+  clearTermWName(colors.white, colors.green)
+  centerTextXY("Downloading "..url)
+  local downloader = http.get(url)
+  local download = downloader.readAll()
+  downloader.close()
+  fs.makeDir(install_to.."/"..topath)
+  local file = fs.open(install_to.."/"..topath, "w")
+  file.write(download)
+  file.close()
+end
+resetTerm()
