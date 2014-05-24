@@ -1,0 +1,7 @@
+{
+  [ "1" ] = "package",
+  [ "2" ] = "cwcos-kernel",
+  [ "3" ] = "init",
+  [ "4" ] = "cossh",
+  [ "5" ] = "acpi",
+}
