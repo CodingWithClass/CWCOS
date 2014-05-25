@@ -23,7 +23,7 @@ os_version_minor = 1
 os_version_revision = 0
 os_version_abr = "alpha"
 license_url = "http://opensource.org/licenses/BSD-3-Clause"
-github_repo = "CodingWithClass/CWCOS/master"
+github_repo = "CodingWithClass/CWCOS/redfileinstaller"
 -- Terminal clearers
 function clearTermWName(fg, bg)
   colorTerm(fg, bg)
