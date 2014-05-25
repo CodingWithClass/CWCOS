@@ -17,7 +17,7 @@ local function centerTextXY(text)
   io.write(text)
 end
 -- OS Config
-os_name = "COSSH"
+os_name = "CraftOS Shell for CWCOS"
 os_version_major = 0
 os_version_minor = 1
 os_version_revision = 0
@@ -127,6 +127,9 @@ for topath, url in pairs(install_files) do
   downloader.close()
   fs.makeDir(install_to.."/"..topath)
   fs.delete(install_to.."/"..topath)
+  if fs.exists(install_to.."/"..topath) then
+    fs.delete(install_to.."/"..topath)
+  end
   local file = fs.open(install_to.."/"..topath, "w")
   file.write(download)
   file.close()
