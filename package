@@ -19,7 +19,7 @@ end
 -- OS Config
 os_name = "package"
 os_version_major = 0
-os_version_minor = 1
+os_version_minor = 2
 os_version_revision = 0
 os_version_abr = "alpha"
 license_url = "http://opensource.org/licenses/BSD-3-Clause"
