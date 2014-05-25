@@ -1,5 +1,5 @@
 {
-  ["/bin/init"] = "http://pastebin.com/raw.php?i=iHah2U3T",
-  ["/etc/init.d/on/exists"] = "http://pastebin.com/raw.php?i=MnqvEZ50",
-  ["/etc/init.d/off/exists"] = "http://pastebin.com/raw.php?i=MnqvEZ50",
+  ["/bin/init"] = "https://raw.githubusercontent.com/CodingWithClass/CWCOS/init/bin/init",
+  ["/etc/init.d/on/exists"] = "https://raw.githubusercontent.com/CodingWithClass/CWCOS/init/etc/init.d/on/exists",
+  ["/etc/init.d/off/exists"] = "https://raw.githubusercontent.com/CodingWithClass/CWCOS/init/etc/init.d/off/exists",
 }
