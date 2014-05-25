@@ -1,0 +1,120 @@
+local tArgs = { ... }
+theapi = {}
+function theapi.createDirectory(_dir)
+  fs.makeDir(_dir)
+end
+function theapi.deleteFile(_file)
+  fs.delete(_file)
+end
+function theapi.download(_url, _to)
+  if not fs.exists(_to) then
+    fs.makeDir(_to)
+    fs.delete(_to)
+  end
+  local httphandle = http.get(_url)
+  local httptext = httphandle.readAll()
+  httphandle.close()
+  local filehandle = fs.open(_to, "w")
+  filehandle.write(httptext)
+  filehandle.close()
+end
+function theapi.install(package)
+  print("Finding package "..package)
+  local found = false
+  for _,pname in pairs(packageList) do
+    if pname == package then
+      print("Found")
+      found = true
+      break
+    end
+  end
+  if not found then
+    term.setTextColor(colors.red)
+    print("ERROR: Package not found in list")
+    return 1
+  end
+  print("Downloading")
+  local packageHTTP = http.get("https://raw.githubusercontent.com/"..ghrepo.."/packagerepo/"..tArgs[2])
+  if not packageHTTP then
+  	term.setTextColor(colors.red)
+    print("ERROR: Download failed. Please try again later.")
+    return 2
+  end
+  local packageinstaller = packageHTTP.readAll()
+  local packagetempfile = fs.open("/pkg/tmp", "w")
+  packagetempfile.write(packageinstaller)
+  packagetempfile.close()
+  local installoutput = os.run({toinstaller}, "/pkg/tmp")
+  fs.delete("/pkg/tmp")
+  if installoutput then
+    print("Install errored.")
+  else
+    print("Installed")
+  end
+end
+
+toinstaller = {
+  ["install"] = theapi
+}
+
+if fs.exists("/pkg/.lock") then
+  term.setTextColor(colors.red)
+  error("ERROR: Could not obtain lock. Is another pkg process running? (/pkg/.lock exists)")
+end
+
+if not http then
+  term.setTextColor(colors.red)
+  print("ERROR: package requires the HTTP API enabled and firewall disabled. Please enable HTTP and set the firewall to \"*\" in the ComputerCraft config.")
+end
+
+if not fs.isDir("/pkg") then
+  print("First run stuff happening")
+  print("Creating /pkg")
+  fs.makeDir("/pkg")
+end
+
+if not fs.exists("/pkg/repo") then
+  print("Creating /pkg/repo")
+  local repofile = fs.open("/pkg/repo", "w")
+  repofile.write("CodingWithClass/CWCOS")
+  repofile.close()
+end
+
+local lock = fs.open("/pkg/.lock", "w")
+lock.write(" ")
+lock.close()
+
+print("Loading repo...")
+local repofile = fs.open("/pkg/repo", "r")
+ghrepo = repofile:readAll()
+local packageListHTTP = http.get("https://raw.githubusercontent.com/"..ghrepo.."/packagerepo/packages")
+if not packageListHTTP and not fs.exists("/pkg/repocache") then
+  term.setTextColor(colors.red)
+  fs.delete("/pkg/.lock")
+  error("ERROR: Package list failed to load from repository and no cache exists. Please check you can get a connection to GitHub.")
+elseif not packageListHTTP and fs.exists("/pkg/repocache") then
+  term.setTextColor(colors.orange)
+  print("WARNING: Package list failed to load from repository. Using cache.")
+  local packageListFile = fs.open("/pkg/cache", "r")
+  local textPackageList = packageListFile.readAll()
+  packageListFile.close()
+  packageList = textutils.unserialize(textPackageList)
+else
+  local textPackageList = packageListHTTP.readAll()
+  packageListHTTP.close()
+  packageList = textutils.unserialize(textPackageList)
+  print("Downloaded")
+end
+packageListCache = fs.open("/pkg/cache", "w")
+packageListCache.write(textutils.serialize(packageList))
+packageListCache.close()
+if tArgs[1] == "find" then
+  print("Packages:")
+  for _,pname in pairs(packageList) do
+    print(pname)
+  end
+elseif tArgs[1] == "install" then
+  theapi.install(tArgs[2])
+end
+
+fs.delete("/pkg/.lock")
