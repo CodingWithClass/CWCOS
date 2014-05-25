@@ -46,11 +46,7 @@ function theapi.install(package)
   packagetempfile.close()
   local installoutput = os.run({toinstaller}, "/pkg/tmp")
   fs.delete("/pkg/tmp")
-  if installoutput then
-    print("Install errored.")
-  else
-    print("Installed")
-  end
+  print("Installed")
 end
 
 toinstaller = {
