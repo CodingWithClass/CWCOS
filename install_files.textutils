@@ -1,4 +1,4 @@
 {
-  ["/startup"] = "http://pastebin.com/raw.php?i=W1ktzU79",
-  ["/boot/kernel/boot"] = "http://pastebin.com/raw.php?i=qppHfqAC"
+  ["/startup"] = "https://raw.githubusercontent.com/CodingWithClass/CWCOS/kernel/startup",
+  ["/boot/kernel/boot"] = "https://raw.githubusercontent.com/CodingWithClass/CWCOS/kernel/boot/kernel/boot"
 }
