@@ -1,4 +1,4 @@
 {
-  ["/bin/reboot"] = "http://pastebin.com/raw.php?i=WCvWyeS1",
-  ["/bin/shutdown"] = "http://pastebin.com/raw.php?i=bJyyviLp",
+  ["/bin/reboot"] = "https://raw.githubusercontent.com/CodingWithClass/CWCOS/acpi/bin/reboot",
+  ["/bin/shutdown"] = "https://raw.githubusercontent.com/CodingWithClass/CWCOS/acpi/bin/shutdown",
 }
