@@ -1,0 +1,106 @@
+-- CWCOS and its installer is licensed under the BSD 3-Clause License.
+-- Copyright (c) 2014 ClassCoder
+-- See the license at http://opensource.org/licenses/BSD-3-Clause.
+
+textcolor = colors.blue
+term.setTextColor(textcolor)
+
+init = {}
+
+function init.postmessageInfo(from, message)
+  write("["..from.."] ")
+  term.setTextColor(colors.lightBlue)
+  print(message)
+  term.setTextColor(textcolor)
+end
+function init.postmessageWarn(from, message)
+  write("["..from.."] ")
+  term.setTextColor(colors.orange)
+  print(message)
+  term.setTextColor(textcolor)
+end
+function init.postmessageError(from, message)
+  write("["..from.."] ")
+  term.setTextColor(colors.red)
+  print(message)
+  term.setTextColor(textcolor)
+end
+
+function init.ok()
+  term.setTextColor(colors.green)
+  local sizex, sizey = term.getSize()
+  local x, y = term.getCursorPos()
+  term.setCursorPos(sizex-9, y-1)
+  print("[  OK  ]")
+  term.setTextColor(textcolor)
+end
+function init.fail()
+  term.setTextColor(colors.red)
+  local sizex, sizey = term.getSize()
+  local x, y = term.getCursorPos()
+  term.setCursorPos(sizex-9, y-1)
+  print("[ FAIL ]")
+  term.setTextColor(textcolor)
+end
+function init.termClear()
+  term.setTextColor(textcolor)
+  term.clear()
+  term.setCursorPos(1, 1)
+end
+function init.termReset()
+  term.setTextColor(textcolor)
+end
+local mon = peripheral.find("monitor")
+if mon then
+  init.monitor = mon
+  term.redirect(mon)
+  init.termClear()
+end
+
+acpi = {}
+
+function acpi.shutdown()
+  init.termReset()
+  init.postmessageInfo("init", "Shutting down")
+  for x,file in pairs(fs.list("/etc/init.d/off")) do
+    os.run(giveChild, "/etc/init.d/off/"..file)
+    term.setTextColor(textcolor)
+  end
+  init.postmessageInfo("init", "Telling kernel")
+  init.ok()
+  sleep(0.5)
+  kernel.shutdown()
+end
+function acpi.reboot()
+  init.termReset()
+  init.postmessageInfo("init", "Rebooting")
+  for x,file in pairs(fs.list("/etc/init.d/off")) do
+    os.run(giveChild, "/etc/init.d/off/"..file)
+    term.setTextColor(textcolor)
+  end
+  init.postmessageInfo("init", "Telling kernel")
+  init.ok()
+  sleep(0.5)
+  kernel.reboot()
+end
+
+giveChild = {
+  ['init'] = init,
+  ['acpi'] = acpi,
+  ['textcolor'] = textcolor,
+  ['kernel'] = kernel,
+}
+
+init.postmessageInfo("init", "Loading init")
+sleep(0.125)
+init.postmessageWarn("init", "Starting in single-user mode (runlevel 1)")
+sleep(0.125)
+for x,file in pairs(fs.list("/etc/init.d/on")) do
+  os.run(giveChild, "/etc/init.d/on/"..file)
+  init.termReset()
+end
+sleep(0.125)
+init.postmessageInfo("init", "Finished")
+init.ok()
+sleep(0.625)
+acpi.reboot()
