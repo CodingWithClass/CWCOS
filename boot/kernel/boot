@@ -1,0 +1,87 @@
+-- CWCOS and its installer is licensed under the BSD 3-Clause License.
+-- Copyright (c) 2014 ClassCoder
+-- See the license at http://opensource.org/licenses/BSD-3-Clause.
+
+-- CWCOS Kernel developers:
+-- ClassCoder
+
+kernel = {}
+
+-- We need the installer's centering, duh!
+-- Various functions with minor indentation modification
+-- http://www.computercraft.info/forums2/index.php?/topic/460-how-to-center-text/page__view__findpost__p__2948
+function kernel.centerText(text)
+  local x,y = term.getSize()
+  local x2,y2 = term.getCursorPos()
+  term.setCursorPos(math.ceil((x / 2) - (text:len() / 2)), y2)
+  write(text)
+end
+-- http://www.computercraft.info/forums2/index.php?/topic/460-how-to-center-text/page__view__findpost__p__70667
+-- Also added yplusminus, I needed to control that
+function kernel.centerTextXY(text, yplusminus)
+  if yplusminus == nil then
+    yplusminus = 0
+  end
+  local w, h = term.getSize()
+  term.setCursorPos(math.floor(w / 2 - text:len() / 2 + .5), math.floor(h / 2 + .5) + yplusminus)
+  io.write(text)
+end
+
+-- And term clearing...
+-- Terminal clearers
+function kernel.clearTermWName(fg, bg, msg, msgt)
+  kernel.colorTerm(fg, bg)
+  term.clear()
+  kernel.centerTextXY(msg, 0)
+  kernel.colorTerm(colors.lightBlue, colors.black)
+  kernel.centerTextXY(msgt, 1)
+  local sizex,sizey = term.getSize()
+  term.setCursorPos(1, 1)
+  kernel.colorTerm(fg, bg)
+end
+function kernel.clearTerm()
+  term.clear()
+  term.setCursorPos(1, 1)
+end
+function kernel.resetTerm()
+  kernel.colorTerm(colors.white, colors.black)
+  kernel.clearTerm()
+  term.setCursorPos(1, 1)
+end
+-- Terminal colorer
+function kernel.colorTerm(fg, bg)
+  term.setTextColor(fg)
+  term.setBackgroundColor(bg)
+end
+function kernel.shutdown()
+  kernel.clearTermWName(colors.blue, colors.black, "Shutting down...", "CWCOS")
+  sleep(.75)
+  os.shutdown()
+end
+function kernel.reboot()
+  kernel.clearTermWName(colors.blue, colors.black, "Restarting...", "CWCOS")
+  sleep(.75)
+  os.reboot()
+end
+
+toInit = {
+  ['kernel'] = kernel,
+}
+
+kernel.clearTermWName(colors.blue, colors.black, "Booting...", "CWCOS")
+print("[KERNEL] Kernel started")
+sleep(.5)
+os.run(toInit, "/bin/init")
+kernel.centerTextXY("Init crash", -1)
+kernel.centerTextXY("Collecting data", 0)
+kernel.centerTextXY("000%", 1)
+sleep(1)
+kernel.centerTextXY("025%", 1)
+sleep(1)
+kernel.centerTextXY("050%", 1)
+sleep(1)
+kernel.centerTextXY("075%", 1)
+sleep(1)
+kernel.centerTextXY("100%", 1)
+sleep(.5)
+os.shutdown()
