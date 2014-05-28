@@ -21,7 +21,7 @@ end
 function theapi.install(package)
   print("Finding package "..package)
   local found = false
-  for _,pname in pairs(packageList) do
+  for pname, repo in pairs(packageList) do
     if pname == package then
       print("Found")
       found = true
@@ -34,18 +34,48 @@ function theapi.install(package)
     return 1
   end
   print("Downloading")
-  local packageHTTP = http.get("https://raw.githubusercontent.com/"..ghrepo.."/packagerepo/"..tArgs[2])
+  local packageHTTP = http.get("https://raw.githubusercontent.com/"..repo.."/install_files.textutils")
   if not packageHTTP then
   	term.setTextColor(colors.red)
     print("ERROR: Download failed. Please try again later.")
     return 2
   end
-  local packageinstaller = packageHTTP.readAll()
-  local packagetempfile = fs.open("/pkg/tmp", "w")
-  packagetempfile.write(packageinstaller)
-  packagetempfile.close()
-  local installoutput = os.run({toinstaller}, "/pkg/tmp")
-  fs.delete("/pkg/tmp")
+  local packageinfo = packageHTTP.readAll()
+  print("Enter an install drive:")
+  if fs.exists("/") then
+    if fs.getFreeSpace("/") then
+      print("/: Free space: "..fs.getFreeSpace("/"))
+    else
+      print("/")
+    end
+  end
+  if fs.exists("/disk") then
+    if fs.getFreeSpace("/disk") then
+      print("/disk: Free space: "..fs.getFreeSpace("/disk"))
+    else
+      print("/disk")
+    end
+  end
+  local install_to = read()
+  if not fs.exists(install_to) then
+    error("ERROR: That location does not exist.")
+  end
+  print("Downloading file list from GitHub")
+  local install_files = textutils.unserialize(http.get("https://raw.githubusercontent.com/"..repo.."/install_files.textutils").readAll())
+  for topath, url in pairs(install_files) do
+    print("Downloading "..url.." to "..topath)
+    local downloader = http.get(url)
+    local download = downloader.readAll()
+    downloader.close()
+    fs.makeDir(install_to.."/"..topath)
+    fs.delete(install_to.."/"..topath)
+    if fs.exists(install_to.."/"..topath) then
+      fs.delete(install_to.."/"..topath)
+    end
+    local file = fs.open(install_to.."/"..topath, "w")
+    file.write(download)
+    file.close()
+  end
   print("Installed")
 end
 
@@ -83,7 +113,7 @@ lock.close()
 print("Loading repo...")
 local repofile = fs.open("/pkg/repo", "r")
 ghrepo = repofile:readAll()
-local packageListHTTP = http.get("https://raw.githubusercontent.com/"..ghrepo.."/packagerepo/packages")
+local packageListHTTP = http.get("https://raw.githubusercontent.com/"..ghrepo.."/newpackagerepo/packages")
 if not packageListHTTP and not fs.exists("/pkg/repocache") then
   term.setTextColor(colors.red)
   fs.delete("/pkg/.lock")
