@@ -1,9 +1,9 @@
 {
-  [ "1" ] = "package",
-  [ "2" ] = "cwcos-kernel",
-  [ "3" ] = "init",
-  [ "4" ] = "cossh",
-  [ "5" ] = "acpi",
-  [ "6" ] = "cwcos",
-  [ "7" ] = "redfile",
+  "package" = "CodingWithClass/CWCOS/package",
+  "cwcos-kernel" = "CodingWithClass/CWCOS/kernel",
+  "init" = "CodingWithClass/CWCOS/init",
+  "cossh" = "CodingWithClass/CWCOS/cossh",
+  "acpi" = "CodingWithClass/CWCOS/acpi",
+  "cwcos" = "CodingWithClass/CWCOS/master",
+  "redfile" = "CodingWithClass/CWCOS/redfileins",
 }
