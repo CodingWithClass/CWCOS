@@ -6,4 +6,5 @@
   "acpi" = "CodingWithClass/CWCOS/acpi",
   "cwcos" = "CodingWithClass/CWCOS/master",
   "redfile" = "CodingWithClass/CWCOS/redfileins",
+  "luaide" = "CodingWithClass/CWCOS/luaide",
 }
